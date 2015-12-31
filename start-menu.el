@@ -10,16 +10,16 @@
 							  (kill-buffer buf))))))
 
 (defun start-menu/translate-conf-to-menu (menu)
-  (let ((name (car menu))
+  (let ((menu-name (car menu))
         (items (cdr menu)))
-    (cons name (mapcar (lambda (item)
+    (cons menu-name (mapcar (lambda (item)
                          (cond ((vectorp item)
                                 (let ((title (aref item 0))
-                                      (path (aref item 1)))
+                                      (program (aref item 1)))
                                   (vector title
 										  (lambda ()
 											(interactive)
-											(start-menu/start-process title title path)))))
+											(start-menu/start-process title title program)))))
                                ((listp item)
                                 (start-menu/translate-conf-to-menu item)))) items))))
 
