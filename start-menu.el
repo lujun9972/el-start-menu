@@ -34,3 +34,5 @@
 (easy-menu-define start-menu global-map
   "menu for start"
   (start-menu/translate-conf-to-menu start-menu/menu-conf))
+
+(provide 'start-menu)
