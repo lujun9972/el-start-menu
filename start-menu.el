@@ -15,11 +15,12 @@
     (cons menu-name (mapcar (lambda (item)
                          (cond ((vectorp item)
                                 (let ((title (aref item 0))
-                                      (program (aref item 1)))
+                                      (program (aref item 1))
+                                      (args (ignore-errors (aref item 2))))
                                   (vector title
 										  (lambda ()
 											(interactive)
-											(start-menu/start-process title title program)))))
+											(apply 'start-menu/start-process title title program (split-string-and-unquote args))))))
                                ((listp item)
                                 (start-menu/translate-conf-to-menu item)))) items))))
 
@@ -29,12 +30,6 @@
                                 ["Firefox" "C:/Program Files/Mozilla Firefox/firefox.exe"]
                                 ["IE" "iexplore.exe"]))
   "")
-(setq start-menu/menu-conf '("Start"
-							 ["Gvim" "D:/Program Files/Vim/vim73/gvim.exe"]
-							 ("网络"
-							  ["Firefox" "C:/Program Files/Mozilla Firefox/firefox.exe"]
-							  ["IE" "iexplore.exe"]))
-	  )
 
 (easy-menu-define start-menu global-map
   "menu for start"
