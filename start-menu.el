@@ -296,3 +296,5 @@ Here is an example:
   (start-menu-translate-conf-to-menu start-menu-menu-conf))
 
 (provide 'start-menu)
+
+;;; start-menu.el ends here
