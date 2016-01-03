@@ -1,5 +1,44 @@
-;; -*- lexical-binding: t; -*-
+;;; start-menu.el --- start-menu for executing external program like the start menu in windows. -*- lexical-binding: t; -*-
 
+;; Copyright (C) 2004-2015 Free Software Foundation, Inc.
+
+;; Author: DarkSun <lujun9972@gmail.com>
+;; Created: 2016-01-03
+;; Version: 0.1
+;; Keywords: convenience, menu
+;; Package-Requires: ((cl-lib "0.5") )
+;; URL: https://github.com/lujun9972/el-start-menu
+
+;; This file is NOT part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Source code
+;;
+;; start-menu's code can be found here:
+;;   http://github.com/lujun9972/el-start-menu
+
+;;; Commentary:
+
+;; start-menu is a little tool that will add a "Start" menu in the menu bar 
+;; You and use the Start menu to executing external program just like the start menu in windows.
+
+;; Quick start:
+
+;; just (require 'start-menu)
+
+;;; Code:
 (require 'cl-lib)
 
 ;; (setq item-firefox (start-menu/make-menu-item "C:/Program Files/Mozilla Firefox/firefox.exe"))
