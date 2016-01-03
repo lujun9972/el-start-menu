@@ -2,33 +2,6 @@
 
 (require 'cl-lib)
 
-(defun start-menu/start-process (name buffer program &rest program-args)
-  "start a program, the buffer will be killed after program exit"
-  (set-process-sentinel (apply 'start-process name buffer program program-args)
-						(lambda (proc event)
-						  (let ((buf (process-buffer proc)))
-							(delete-process proc)
-							(unless (get-buffer-process buf)
-							  (kill-buffer buf))))))
-
-(defun start-menu/translate-conf-to-menu (menu)
-  (let ((menu-name (car menu))
-        (items (cdr menu)))
-    (cons menu-name
-          (mapcar (lambda (item)
-                    (cond ((vectorp item)
-                           (let ((title (aref item 0))
-                                 (program (aref item 1))
-                                 (args (or (ignore-errors (aref item 2))
-                                           "")))
-                             (vector title
-                                     (lambda ()
-                                       (interactive)
-                                       (apply 'start-menu/start-process title title program (split-string-and-unquote args))))))
-                          ((listp item)
-                           (start-menu/translate-conf-to-menu item)))) items))))
-
-
 ;; (setq item-firefox (start-menu/make-menu-item "C:/Program Files/Mozilla Firefox/firefox.exe"))
 ;; => ["firefox" "C:/Program Files/Mozilla Firefox/firefox.exe" nil]
 (defun start-menu/make-menu-item (program &optional name args)
@@ -248,6 +221,33 @@ Here is an example:
  (\"Browser\"
   [\"Firefox\" \"firefox\"]
   [\"Chrome\" \"chromium-browser\"]))")
+
+(defun start-menu/start-process (name buffer command)
+  "start a program, the buffer will be killed after program exit"
+  (set-process-sentinel (funcall 'start-process name buffer "/bin/sh" "-c" command)
+						(lambda (proc event)
+						  (let ((buf (process-buffer proc)))
+							(delete-process proc)
+							(unless (get-buffer-process buf)
+							  (kill-buffer buf))))))
+
+(defun start-menu/translate-conf-to-menu (menu)
+  (let ((menu-name (car menu))
+        (items (cdr menu)))
+    (cons menu-name
+          (mapcar (lambda (item)
+                    (cond ((vectorp item)
+                           (let ((title (aref item 0))
+                                 (program (aref item 1))
+                                 (args (or (ignore-errors (aref item 2))
+                                           "")))
+                             (vector title
+                                     (lambda ()
+                                       (interactive)
+                                       (funcall 'start-menu/start-process title title program )))))
+                          ((listp item)
+                           (start-menu/translate-conf-to-menu item)))) items))))
+
 
 
 (easy-menu-define start-menu global-map
