@@ -28,12 +28,6 @@
                           ((listp item)
                            (start-menu/translate-conf-to-menu item)))) items))))
 
-(defvar start-menu/menu-conf '("Start"
-                               ["Gvim" "gvim"]
-                               ("网络"
-                                ["Firefox" "firefox"]
-                                ["Chrome" "chromium-browser"]))
-  "")
 
 ;; (setq item-firefox (start-menu/make-menu-item "C:/Program Files/Mozilla Firefox/firefox.exe"))
 ;; => ["firefox" "C:/Program Files/Mozilla Firefox/firefox.exe" nil]
@@ -199,6 +193,62 @@ If CREATE is non-nil, it will create submenu by SUBMENU-PATH-LIST"
   "If SUBMENU-OR-ITEM did not exist in MENU, insert it into MENU(MENU will be alerted). otherwise do nothing. "
   (unless (start-menu/exist-in-p submenu-or-item menu)
     (start-menu/insert-into-menu-last! menu submenu-or-item)))
+
+;; (start-menu/add-menu-item-by-debian-menu-file menu-start "/usr/share/menu/nethack-x11")
+;; => ("Adventure" ["X NetHack" "/usr/games/xnethack" nil])
+;; menu-start
+;; => ("Start" ("Internet" ["firefox" "C:/Program Files/Mozilla Firefox/firefox.exe" nil] ["chrome" "chrome" nil]) ["emacs" "/bin/emacs" nil] ["gvim" "/bin/gvim" nil] ["chrome" "chrome" nil] ("internet" ("Browser")) ("Games" ("Adventure" ["X NetHack" "/usr/games/xnethack" nil])))
+(defun start-menu/add-menu-item-by-debian-menu-file (menu debian-menu-file)
+  "add new menu-item according to DEBIAN-MENU-FILE"
+  (when (file-exists-p debian-menu-file)
+    (let (file-content command section title hints icon)
+      (with-temp-buffer
+        (insert-file-contents debian-menu-file)
+        (setq file-content (buffer-string)))
+      (when (string-match "command=\"\\([^\"]+\\)\"" file-content)
+        (setq command (match-string 1 file-content)))
+      (when (string-match "section=\"\\([^\"]+\\)\"" file-content)
+        (setq section (match-string 1 file-content)))
+      (when (string-match "title=\"\\([^\"]+\\)\"" file-content)
+        (setq title (match-string 1 file-content)))
+      (when (string-match "hints=\"\\([^\"]+\\)\"" file-content)
+        (setq hints (match-string 1 file-content)))
+      (when (string-match "icon=\"\\([^\"]+\\)\"" file-content)
+        (setq icon (match-string 1 file-content)))
+      (when command 
+        (let* ((menu-item (start-menu/make-menu-item command title))
+               (submenu-path (split-string section "/"))
+               (submenu (start-menu/find-submenu menu submenu-path t)))
+          (start-menu/add-to-menu-content-last! submenu menu-item)
+          menu)))))
+
+(defun start-menu/add-menu-item-by-debian-menu-dir (menu debian-menu-dir)
+  "add menu-item to MENU according all debain-menu-file in DEBIAN-MENU-DIR"
+  (when (file-exists-p debian-menu-dir)
+    (dolist (debian-menu-file (directory-files debian-menu-dir t "[^.].*"))
+      (start-menu/add-menu-item-by-debian-menu-file menu debian-menu-file))
+    menu))
+
+(defun start-menu/init-debian-menu-conf ()
+  (let ((start-menu (start-menu/make-menu "Start")))
+    (dolist (debian-menu-dir '("/usr/share/menu/" "/usr/lib/menu/" "/etc/menu/" "~/.menu/"))
+      (start-menu/add-menu-item-by-debian-menu-dir start-menu debian-menu-dir))
+    start-menu))
+
+(defvar start-menu/menu-conf (start-menu/init-debian-menu-conf)
+  "the format of start-menu/menu-conf is a menu which looks like (MENU-NAME MENU... MENU-ITEM...)
+
+MENU-TITLE is a string as name of menu.
+MENU is another menu
+MENU-ITEM is a vector which first element is the name of menu-item and second element is the program to be executed
+
+Here is an example:
+(\"Start\"
+ [\"Gvim\" \"gvim\"]
+ (\"Browser\"
+  [\"Firefox\" \"firefox\"]
+  [\"Chrome\" \"chromium-browser\"]))")
+
 
 (easy-menu-define start-menu global-map
   "menu for start"
