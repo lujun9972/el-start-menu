@@ -292,12 +292,20 @@ Here is an example:
                           ((listp item)
                            (start-menu-translate-conf-to-menu item)))) items))))
 
+;;;###autoload 
+(defun start-menu-enable ()
+  "enable start menu"
+  (interactive)
+  (when start-menu-menu-conf
+    (easy-menu-define start-menu global-map
+      "menu for start"
+      (start-menu-translate-conf-to-menu start-menu-menu-conf))))
 
-
-(when start-menu-menu-conf
-  (easy-menu-define start-menu global-map
-    "menu for start"
-    (start-menu-translate-conf-to-menu start-menu-menu-conf)))
+;;;###autoload 
+(defun start-menu-disable ()
+  "disable start menu"
+  (interactive)
+  (define-key global-map [menu-bar Start] 'undefined))
 
 (provide 'start-menu)
 
