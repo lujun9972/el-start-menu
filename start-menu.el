@@ -250,7 +250,13 @@ If CREATE is non-nil, it will create submenu by SUBMENU-PATH-LIST"
       (start-menu-add-menu-item-by-debian-menu-dir start-menu debian-menu-dir))
     start-menu))
 
-(defvar start-menu-menu-conf (start-menu-init-debian-menu-conf)
+(defgroup start-menu nil
+  "Start Menu"
+  :group 'extensions
+  :group 'convenience
+  :prefix "start-menu-")
+
+(defcustom start-menu-menu-conf (start-menu-init-debian-menu-conf)
   "the format of start-menu-menu-conf is a menu which is actually a list looks like (MENU-NAME MENU... MENU-ITEM...)
 
 MENU-TITLE is a string as name of menu.
@@ -262,7 +268,8 @@ Here is an example:
  [\"Gvim\" \"gvim\"]
  (\"Browser\"
   [\"Firefox\" \"firefox\"]
-  [\"Chrome\" \"chromium-browser\"]))")
+  [\"Chrome\" \"chromium-browser\"]))"
+  :group 'start-menu)
 
 (defun start-menu-start-process (name command)
   "start a program, the buffer will be killed after program exit"
