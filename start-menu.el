@@ -4,10 +4,10 @@
 
 ;; (setq item-firefox (start-menu/make-menu-item "C:/Program Files/Mozilla Firefox/firefox.exe"))
 ;; => ["firefox" "C:/Program Files/Mozilla Firefox/firefox.exe" nil]
-(defun start-menu/make-menu-item (program &optional name args)
+(defun start-menu/make-menu-item (command &optional name hints)
   "return a new menu-item. If NAME is nil the name of new menu-item will be the basename of PROGRAM"
-  (let ((name (or name (file-name-base program))))
-    (vector name program args)))
+  (let ((name (or name (file-name-base command))))
+    (vector name command hints)))
 
 ;; (setq menu-start (start-menu/make-menu "Start" (start-menu/make-menu-item "/bin/emacs") (start-menu/make-menu-item "/bin/gvim")))
 ;; => ("Start" ["emacs" "/bin/emacs" nil] ["gvim" "/bin/gvim" nil])
@@ -189,7 +189,7 @@ If CREATE is non-nil, it will create submenu by SUBMENU-PATH-LIST"
       (when (string-match "icon=\"\\([^\"]+\\)\"" file-content)
         (setq icon (match-string 1 file-content)))
       (when command 
-        (let* ((menu-item (start-menu/make-menu-item command title))
+        (let* ((menu-item (start-menu/make-menu-item command title hints))
                (submenu-path (split-string section "/"))
                (submenu (start-menu/find-submenu menu submenu-path t)))
           (start-menu/add-to-menu-content-last! submenu menu-item)
@@ -209,10 +209,10 @@ If CREATE is non-nil, it will create submenu by SUBMENU-PATH-LIST"
     start-menu))
 
 (defvar start-menu/menu-conf (start-menu/init-debian-menu-conf)
-  "the format of start-menu/menu-conf is a menu which looks like (MENU-NAME MENU... MENU-ITEM...)
+  "the format of start-menu/menu-conf is a menu which is actually a list looks like (MENU-NAME MENU... MENU-ITEM...)
 
 MENU-TITLE is a string as name of menu.
-MENU is another menu
+MENU is another sub-menu
 MENU-ITEM is a vector which first element is the name of menu-item and second element is the program to be executed
 
 Here is an example:
@@ -237,13 +237,14 @@ Here is an example:
           (mapcar (lambda (item)
                     (cond ((vectorp item)
                            (let ((title (aref item 0))
-                                 (program (aref item 1))
-                                 (args (or (ignore-errors (aref item 2))
+                                 (command (aref item 1))
+                                 (hints (or (ignore-errors (aref item 2))
                                            "")))
                              (vector title
                                      (lambda ()
                                        (interactive)
-                                       (funcall 'start-menu/start-process title program )))))
+                                       (funcall 'start-menu/start-process title command ))
+                                     :help hints)))
                           ((listp item)
                            (start-menu/translate-conf-to-menu item)))) items))))
 
