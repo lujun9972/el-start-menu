@@ -42,6 +42,7 @@
 
 ;;; Code:
 (require 'cl-lib)
+(require 'easymenu)
 
 ;; (setq item-firefox (start-menu-make-menu-item "C:/Program Files/Mozilla Firefox/firefox.exe"))
 ;; => ["firefox" "C:/Program Files/Mozilla Firefox/firefox.exe" nil]
