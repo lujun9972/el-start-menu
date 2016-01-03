@@ -1,5 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
+(require 'cl-lib)
+
 (defun start-menu/start-process (name buffer program &rest program-args)
   "start a program, the buffer will be killed after program exit"
   (set-process-sentinel (apply 'start-process name buffer program program-args)
@@ -69,24 +71,29 @@
 (defun start-menu/menu-item-p (object)
   (vectorp object))
 
+(defun start-menu/find-submenu (menu submenu-name)
+  "find submenu which name is SUBMENU-NAME of MENU "
+  (let ((submenus (cl-remove-if-not #'start-menu/menu-p (start-menu/menu-content menu))))
+    (cl-find-if (lambda (menu)
+                  (string-equal submenu-name (start-menu/menu-name menu)))
+                submenus)))
+
 (defun start-menu/exist-in-p (submenu-or-items menu)
   "Is SUBMENU-OR-ITEMS exist in MENU"
   (cond ((start-menu/menu-p submenu-or-items)
-         (let* ((submenu-name (start-menu/menu-name submenu-or-items))
-                (submenus-already-exist (cl-remove-if-not #'start-menu/menu-p (start-menu/menu-content menu)))
-                (submenu-names-already-exist (mapcar #'start-menu/menu-name submenus-already-exist)))
-           (member submenu-name submenu-names-already-exist)))
+         (let ((submenu-name (start-menu/menu-name submenu-or-items)))
+           (start-menu/find-submenu menu (submenu-name))))
         ((start-menu/menu-item-p submenu-or-items)
          (let* ((menu-items-already-exist (cl-remove-if-not #'start-menu/menu-item-p (start-menu/menu-content menu))))
            (member submenu-or-items menu-items-already-exist)))
         (t (error "Invalid Data Type: %s" submenu-or-items))))
 
-(defun start-menu/add-to-menu-first (menu submenu-or-item)
+(defun start-menu/add-to-menu-content-first (menu submenu-or-item)
   "If SUBMENU-OR-ITEM did not exist in MENU, insert it into MENU. otherwise do nothing"
   (unless (start-menu/exist-in-p submenu-or-item menu)
     (start-menu/insert-into-menu-first menu submenu-or-item)))
 
-(defun start-menu/add-to-menu-last (menu submenu-or-item)
+(defun start-menu/add-to-menu-content-last (menu submenu-or-item)
   "If SUBMENU-OR-ITEM did not exist in MENU, insert it into MENU. otherwise do nothing"
   (unless (start-menu/exist-in-p submenu-or-item menu)
     (start-menu/insert-into-menu-last menu submenu-or-item)))
