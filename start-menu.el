@@ -222,14 +222,13 @@ Here is an example:
   [\"Firefox\" \"firefox\"]
   [\"Chrome\" \"chromium-browser\"]))")
 
-(defun start-menu/start-process (name buffer command)
+(defun start-menu/start-process (name command)
   "start a program, the buffer will be killed after program exit"
-  (set-process-sentinel (funcall 'start-process name buffer "/bin/sh" "-c" command)
-						(lambda (proc event)
-						  (let ((buf (process-buffer proc)))
-							(delete-process proc)
-							(unless (get-buffer-process buf)
-							  (kill-buffer buf))))))
+  (switch-to-buffer (funcall #'make-comint name "/bin/sh" nil "-c" command))
+  (set-process-sentinel (get-buffer-process (current-buffer))
+                        (lambda (process event)
+                          (when (eq 'exit (process-status process))
+                            (kill-buffer (process-buffer process))))))
 
 (defun start-menu/translate-conf-to-menu (menu)
   (let ((menu-name (car menu))
@@ -244,7 +243,7 @@ Here is an example:
                              (vector title
                                      (lambda ()
                                        (interactive)
-                                       (funcall 'start-menu/start-process title title program )))))
+                                       (funcall 'start-menu/start-process title program )))))
                           ((listp item)
                            (start-menu/translate-conf-to-menu item)))) items))))
 
