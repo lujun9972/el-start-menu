@@ -1,0 +1,15 @@
+#+TITLE: README
+#+AUTHOR: lujun9972
+#+CATEGORY: start-menu
+#+DATE: [2016-01-04 一 00:05]
+#+OPTIONS: ^:{}
+
+* Start Menu
+start-menu is a little tool that will add a "Start" menu in the menu bar.
+
+You can use the Start menu to executing external program just like the start menu in windows.
+
+* Usage
+just (require 'start-menu) and you will see the "Start" menu at the beginnig of menu bar.
+
+[[file:./jp.png]]
