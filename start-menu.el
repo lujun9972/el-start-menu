@@ -304,7 +304,7 @@ Here is an example:
 (defun start-menu-enable ()
   "enable start menu"
   (interactive)
-  (when start-menu-menu-conf
+  (when (start-menu-menu-content start-menu-menu-conf)
     (easy-menu-define start-menu global-map
       "menu for start"
       (start-menu-translate-conf-to-menu start-menu-menu-conf))))
