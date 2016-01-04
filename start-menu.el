@@ -45,6 +45,9 @@
 (require 'cl-lib)
 (require 'easymenu)
 
+
+;;; BASIC API
+
 ;; (setq item-firefox (start-menu-make-menu-item "C:/Program Files/Mozilla Firefox/firefox.exe"))
 ;; => ["firefox" "C:/Program Files/Mozilla Firefox/firefox.exe" nil]
 (defun start-menu-make-menu-item (command &optional name hints)
@@ -210,6 +213,9 @@ If CREATE is non-nil, it will create submenu by SUBMENU-PATH-LIST"
   (unless (start-menu-exist-in-p submenu-or-item menu)
     (start-menu-insert-into-menu-last! menu submenu-or-item)))
 
+
+;;; HANDLE DEBIAN MENU
+
 ;; (start-menu-add-menu-item-by-debian-menu-file menu-start "/usr/share/menu/nethack-x11")
 ;; => ("Adventure" ["X NetHack" "/usr/games/xnethack" nil])
 ;; menu-start
@@ -251,6 +257,11 @@ If CREATE is non-nil, it will create submenu by SUBMENU-PATH-LIST"
       (start-menu-add-menu-item-by-debian-menu-dir start-menu debian-menu-dir))
     start-menu))
 
+
+;;; HANDLE DEBIAN MENU
+
+
+;;; GENERATE THE START MENU
 (defgroup start-menu nil
   "Start Menu"
   :group 'extensions
