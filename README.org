@@ -12,10 +12,12 @@ You can use the Start menu to executing external program just like the start men
 
 * Usage
 
-If you are using debian linux or ubuntu linux just (require 'start-menu)
+If you are using debian linux or ubuntu linux just  =M-x start-menu-enable=
 
-Otherwise, you should config start-menu-menu-conf first then (require 'start-menu)
+Otherwise, you should config start-menu-menu-conf first then =M-x start-menu-enable=
 
 For Windows user: the path to program often contains space, so may be you should use "" to quote the path
+
+If you don't need Start menu any more,just =M-x start-menu-disable=
 
 [[file:./jp.png]]
