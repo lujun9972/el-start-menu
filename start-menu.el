@@ -1,4 +1,4 @@
-;;; start-menu.el --- start-menu for executing external program like the start menu in windows. -*- lexical-binding: t; -*-
+;;; start-menu.el --- start-menu for executing external program like in windows -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2004-2015 Free Software Foundation, Inc.
 
