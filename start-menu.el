@@ -36,9 +36,10 @@
 
 ;; Quick start:
 
-;; If you are using debian linux or ubuntu linux just (require 'start-menu)
-;; Otherwise, you should config start-menu-menu-conf first then (require 'start-menu)
+;; If you are using debian linux or ubuntu linux just M-x start-menu-enable
+;; Otherwise, you should config start-menu-menu-conf first then M-x start-menu-enable
 ;; For Windows user: Sine the path to program often contains space, so may be you use "" to quote the path
+;; If you don't need Start menu any more,just M-x start-menu-disable
 
 ;;; Code:
 (require 'cl-lib)
@@ -303,7 +304,7 @@ Here is an example:
 (defun start-menu-enable ()
   "enable start menu"
   (interactive)
-  (when start-menu-menu-conf
+  (when (start-menu-menu-content start-menu-menu-conf)
     (easy-menu-define start-menu global-map
       "menu for start"
       (start-menu-translate-conf-to-menu start-menu-menu-conf))))
