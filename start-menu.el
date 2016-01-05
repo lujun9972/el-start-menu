@@ -258,8 +258,58 @@ If CREATE is non-nil, it will create submenu by SUBMENU-PATH-LIST"
     start-menu))
 
 
-;;; HANDLE DEBIAN MENU
+;;; HANDLE XDG MENU 
 
+;; (start-menu-add-menu-item-by-xdg-menu-file menu-start "/usr/share/applications/firefox.desktop")
+;; => ("Adventure" ["X NetHack" "/usr/games/xnethack" nil])
+;; menu-start
+;; => ("Start" ("Internet" ["firefox" "C:/Program Files/Mozilla Firefox/firefox.exe" nil] ["chrome" "chrome" nil]) ["emacs" "/bin/emacs" nil] ["gvim" "/bin/gvim" nil] ["chrome" "chrome" nil] ("internet" ("Browser")) ("Games" ("Adventure" ["X NetHack" "/usr/games/xnethack" nil])))
+(defun start-menu-add-menu-item-by-xdg-menu-file (menu xdg-menu-file)
+  "add new menu-item according to XDG-MENU-FILE"
+  (when (file-exists-p xdg-menu-file)
+    (let (file-content
+          type
+          exec
+          (categories "")
+          name
+          comment
+          icon)
+      (with-temp-buffer
+        (insert-file-contents xdg-menu-file)
+        (setq file-content (buffer-string)))
+      (when (string-match "Type=\\([^\r\n]+\\)" file-content)
+        (setq type (match-string 1 file-content)))
+      (when (string-match "Exec=\\([^\r\n%]+\\)" file-content)
+        (setq exec (match-string 1 file-content)))
+      (when (string-match "Categories=\\([^\r\n]+\\)" file-content)
+        (setq categories (match-string 1 file-content)))
+      (when (string-match "Name=\\([^\r\n]+\\)" file-content)
+        (setq name (match-string 1 file-content)))
+      (when (string-match "Comment=\\([^\r\n]+\\)" file-content)
+        (setq comment (match-string 1 file-content)))
+      (when (string-match "Icon=\\([^\r\n]+\\)" file-content)
+        (setq icon (match-string 1 file-content)))
+      (when (and exec
+                 (string-equal "Application" type))
+        (let* ((menu-item (start-menu-make-menu-item exec name comment))
+               (submenu-path (cl-remove "" (split-string categories ";") :test #'string-equal))
+               (submenu (start-menu-find-submenu menu submenu-path t)))
+          (start-menu-add-to-menu-content-last! submenu menu-item)
+          menu)))))
+
+(defun start-menu-add-menu-item-by-xdg-menu-dir (menu xdg-menu-dir)
+  "add menu-item to MENU according all xdg-menu-file in XDG-MENU-DIR"
+  (when (file-exists-p xdg-menu-dir)
+    (dolist (xdg-menu-file (directory-files-recursively xdg-menu-dir "\\.desktop$"))
+      (start-menu-add-menu-item-by-xdg-menu-file menu xdg-menu-file))
+    menu))
+
+(defun start-menu-init-xdg-menu-conf ()
+  (let ((start-menu (start-menu-make-menu "Start")))
+    (dolist (xdg-menu-dir '("/usr/share/applications/"))
+      (start-menu-add-menu-item-by-xdg-menu-dir start-menu xdg-menu-dir))
+    start-menu))
+;; (start-menu-init-menu-conf)
 
 ;;; GENERATE THE START MENU
 (defgroup start-menu nil
@@ -268,10 +318,20 @@ If CREATE is non-nil, it will create submenu by SUBMENU-PATH-LIST"
   :group 'convenience
   :prefix "start-menu-")
 
-(defcustom start-menu-menu-conf (start-menu-init-debian-menu-conf)
+(defcustom start-menu-init-menu-conf-type 'debian
+  "When package loaded, It will automatically generate the init start-menu according to debian-menu or xdg-menu"
+  :type '(choice (const debian)
+                 (const xdg))
+  :group 'start-menu)
+
+(defun start-menu-init-menu-conf ()
+  (let ((init-menu-conf-fn (intern (format "start-menu-init-%s-menu-conf" start-menu-init-menu-conf-type))))
+    (funcall init-menu-conf-fn)))
+
+(defcustom start-menu-menu-conf (start-menu-init-menu-conf)
   "the format of start-menu-menu-conf is a menu which is actually a list looks like (MENU-NAME MENU... MENU-ITEM...)
 
-MENU-TITLE is a string as name of menu.
+MENU-NAME is a string as name of menu.
 MENU is another sub-menu
 MENU-ITEM is a vector which first element is the name of menu-item and second element is the program to be executed
 
