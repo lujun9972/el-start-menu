@@ -21,3 +21,5 @@ For Windows user: the path to program often contains space, so may be you should
 If you don't need Start menu any more,just =M-x start-menu-disable=
 
 [[file:./jp.png]]
+
+Since many user hidden the menu bar, so there is also a command =start-menu-popup= which will pop up the start menu. 
