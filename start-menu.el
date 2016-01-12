@@ -6,7 +6,7 @@
 ;; Created: 2016-01-03
 ;; Version: 0.1
 ;; Keywords: convenience, menu
-;; Package-Requires: ((cl-lib "0.5") )
+;; Package-Requires: ((cl-lib "0.5") (config-parser))
 ;; URL: https://github.com/lujun9972/el-start-menu
 
 ;; This file is NOT part of GNU Emacs.
@@ -45,6 +45,7 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'easymenu)
+(require 'config-parser)
 
 
 ;;; BASIC API
@@ -268,32 +269,18 @@ If CREATE is non-nil, it will create submenu by SUBMENU-PATH-LIST"
 (defun start-menu-add-menu-item-by-xdg-menu-file (menu xdg-menu-file)
   "add new menu-item according to XDG-MENU-FILE"
   (when (file-exists-p xdg-menu-file)
-    (let (file-content
-          type
-          exec
-          (categories "")
-          name
-          comment
-          icon)
-      (with-temp-buffer
-        (insert-file-contents xdg-menu-file)
-        (setq file-content (buffer-string)))
-      (when (string-match "Type=\\([^\r\n]+\\)" file-content)
-        (setq type (match-string 1 file-content)))
-      (when (string-match "Exec=\\([^\r\n%]+\\)" file-content)
-        (setq exec (match-string 1 file-content)))
-      (when (string-match "Categories=\\([^\r\n]+\\)" file-content)
-        (setq categories (match-string 1 file-content)))
-      (when (string-match "Name=\\([^\r\n]+\\)" file-content)
-        (setq name (match-string 1 file-content)))
-      (when (string-match "Comment=\\([^\r\n]+\\)" file-content)
-        (setq comment (match-string 1 file-content)))
-      (when (string-match "Icon=\\([^\r\n]+\\)" file-content)
-        (setq icon (match-string 1 file-content)))
+    (let* ((file-config-data (config-parser-read xdg-menu-file "=")) 
+           (type (config-parser-get file-config-data "Desktop Entry" "Type"))
+           (exec (string-trim (replace-regexp-in-string "%[a-zA-Z]" "" (config-parser-get file-config-data "Desktop Entry" "Exec") t)))
+           (categories (or (config-parser-get file-config-data "Desktop Entry" "Categories")
+                           ""))
+           (name (config-parser-get file-config-data "Desktop Entry" "Name"))
+           (comment (config-parser-get file-config-data "Desktop Entry" "Comment"))
+           (icon (config-parser-get file-config-data "Desktop Entry" "Icon")))
       (when (and exec
                  (string-equal "Application" type))
         (let* ((menu-item (start-menu-make-menu-item exec name comment))
-               (submenu-path (cl-remove "" (split-string categories ";") :test #'string-equal))
+               (submenu-path (last (cl-remove "" (split-string categories ";") :test #'string-equal)))
                (submenu (start-menu-find-submenu menu submenu-path t)))
           (start-menu-add-to-menu-content-last! submenu menu-item)
           menu)))))
@@ -363,7 +350,7 @@ Here is an example:
                            (let ((title (aref item 0))
                                  (command (aref item 1))
                                  (hints (or (ignore-errors (aref item 2))
-                                           "")))
+                                            "")))
                              (vector title
                                      (lambda ()
                                        (interactive)
