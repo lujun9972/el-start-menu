@@ -6,7 +6,7 @@
 ;; Created: 2016-01-03
 ;; Version: 0.1
 ;; Keywords: convenience, menu
-;; Package-Requires: ((cl-lib "0.5") config-parser)
+;; Package-Requires: ((cl-lib "0.5") (config-parser "0.1"))
 ;; URL: https://github.com/lujun9972/el-start-menu
 
 ;; This file is NOT part of GNU Emacs.
