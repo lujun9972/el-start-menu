@@ -1,6 +1,6 @@
 ;;; start-menu.el --- start-menu for executing external program like in windows -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2004-2015 Free Software Foundation, Inc.
+;; Copyright (C) 2004-2015 DarkSun <lujun9972@gmail.com>.
 
 ;; Author: DarkSun <lujun9972@gmail.com>
 ;; Created: 2016-01-03
